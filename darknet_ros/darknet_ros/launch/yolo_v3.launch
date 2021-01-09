@@ -10,7 +10,12 @@
 
 
   <!-- Use YOLOv3 -->
-  <arg name="network_param_file"         default="$(find darknet_ros)/config/yolov3.yaml"/>
+  
+  <!-- Pre-trained model -->
+  <!-- <arg name="network_param_file"         default="$(find darknet_ros)/config/yolov3.yaml"/> -->
+
+  <!-- SVC Model -->
+  <arg name="network_param_file"         default="$(find darknet_ros)/config/SVC.yaml"/>
   <!-- <arg name="image" default="camera/rgb/image_raw" /> -->
 
 

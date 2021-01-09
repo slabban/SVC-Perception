@@ -1,0 +1,34 @@
+<?xml version="1.0"?>
+<launch>
+
+
+
+  <arg name="camera_name" default="front_camera" />
+ <!-- <arg name="camera_serial" default="19140982" /> -->
+  <arg name="camera_info_file" default="$(find camera_lidar_project)/yaml/logi_camera_info.yaml" />
+
+  <include file="$(find camera_lidar_project)/launch/logi_camera_driver.launch" >
+  </include>
+
+  <group ns="$(arg camera_name)" >
+    <node pkg="nodelet" type="nodelet" name="camera_nodelet_manager" args="manager" cwd="node" output="screen" />
+
+    <!-- Debayer the image -->
+    <node pkg="nodelet" type="nodelet" name="image_proc_debayer" args="load image_proc/debayer camera_nodelet_manager" />
+
+    <!-- Apply lens rectification -->
+    <node pkg="nodelet" type="nodelet" name="image_proc_rectify" args="load image_proc/rectify camera_nodelet_manager" >
+      <remap from="image_mono" to="image_color" />
+      <remap from="image_rect" to="image_rect_color" />
+    </node>
+
+    <!-- Offline bag playback from compressed image topic -->
+    <node pkg="camera_lidar_project" type="pub_camera_info.py" name="pub_camera_info" >
+      <param name="yaml_file" value="$(arg camera_info_file)" />
+    </node>
+  
+  </group>
+
+ <!-- <include file="$(find darknet_ros)/launch/yolo_v3.launch"> </include> -->
+
+</launch>

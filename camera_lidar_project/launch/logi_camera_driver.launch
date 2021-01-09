@@ -1,0 +1,17 @@
+<?xml version="1.0"?>
+<launch>
+
+  <arg name="dev" default="/dev/video2" />
+  <arg name="camera_name" default="front_camera" />
+  
+  <node pkg="usb_cam" type="usb_cam_node" name="$(arg camera_name)" output="screen" >
+    <param name="video_device" value="$(arg dev)" />
+    <param name="camera_name" value="$(arg camera_name)" />
+    <param name="camera_frame_id" value="$(arg camera_name)" />
+    <param name="camera_info_url" value="package://camera_lidar_project/yaml/logi_camera_info.yaml" />
+    <param name="pixel_format" value="yuyv" />
+  </node>
+
+
+
+</launch>

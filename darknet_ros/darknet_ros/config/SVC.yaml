@@ -1,0 +1,16 @@
+yolo_model:
+
+  config_file:
+    name: SVC.cfg
+  weight_file:
+    name: SVC.weights
+  threshold:
+    value: 0.3
+  detection_classes:
+    names:
+      - One Way
+      - Pedestrian
+      - Road Closed
+      - Stop Sign
+      - Construction Barrel
+      - No Turns

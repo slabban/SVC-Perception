@@ -1,0 +1,11 @@
+<?xml version="1.0"?>
+<launch>
+
+  <include file="$(find camera_lidar_project)/launch/logitech_calibrated.launch" >
+  </include>
+
+  <!-- Launch YOLOv3 -->
+  <include file="$(find darknet_ros)/launch/yolo_v3.launch"> </include>
+
+
+</launch>

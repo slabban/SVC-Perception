@@ -68,6 +68,9 @@ namespace camera_lidar_project
       // Function that compares 2D Boxes from LIDAR and YOLO
       bool IoU(cv::Rect2d r1, const darknet_ros_msgs::BoundingBox& detect,  int stale_objects);
 
+      //IGVC IOU Implementation
+      void IOU(cv::Rect2d r1, const darknet_ros_msgs::BoundingBox& detect);
+
       //void updateTimerCallback(const ros::TimerEvent& event);
 
 
@@ -87,7 +90,8 @@ namespace camera_lidar_project
       tf2_ros::StaticTransformBroadcaster broadcaster_;
 
       ros::Subscriber sub_cam_info_;
-      ros::Publisher car_bboxes_;
+      ros::Publisher road_closed_bboxes_;
+      ros::Subscriber sub_lidar_objects_;
 
 
     sensor_msgs::CameraInfo camera_info_;
@@ -102,7 +106,12 @@ namespace camera_lidar_project
     //Stores the ID of the fused object
     std::vector<int> previous_Box;
 
-    ros::Subscriber sub_lidar_objects_;
+    //IGVC fused objects
+    std::vector<int> One_Way;
+    std::vector<int> Pedestrian;
+    std::vector<int> Road_Closed;
+    std::vector<int> Stop_Sign;
+    std::vector<int> Construction_Barrel;
 
     
     // Stores the entire message contents of the fused objects, for future use
