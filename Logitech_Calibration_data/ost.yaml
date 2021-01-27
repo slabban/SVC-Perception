@@ -1,5 +1,6 @@
 image_width: 640
 image_height: 480
+# Extremely Important to ensure correct names!
 camera_name: front_camera
 camera_matrix:
   rows: 3
@@ -7,6 +8,7 @@ camera_matrix:
   data: [ 627.99992,    0.     ,  297.43753,
             0.     ,  626.29831,  236.01111,
             0.     ,    0.     ,    1.     ]
+#Change 'camera' to 'distortion'
 camera_model: plumb_bob
 distortion_coefficients:
   rows: 1
