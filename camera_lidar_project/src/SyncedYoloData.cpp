@@ -31,16 +31,25 @@ namespace camera_lidar_project
 
     sub_lidar_objects_ = n.subscribe("/lidar_ekf/object_tracks", 5, &SyncedYoloData::recvLidarObjects, this);
 
-    road_closed_bboxes_ = n.advertise<avs_lecture_msgs::TrackedObjectArray>("fused_objects", 1);
+    one_way_bboxes_ = n.advertise<avs_lecture_msgs::TrackedObjectArray>("one_way_boxes", 1);
+    pedestrian_bboxes_ = n.advertise<avs_lecture_msgs::TrackedObjectArray>("pedestrian_boxes", 1);
+    stop_sign_bboxes_ = n.advertise<avs_lecture_msgs::TrackedObjectArray>("stop_sign_boxes", 1);
+    construction_barrel_bboxes_ = n.advertise<avs_lecture_msgs::TrackedObjectArray>("construction_barrel_boxes", 1);
+
 
 
     looked_up_camera_transform_ = false;
 
     previous_Box.clear();
 
+    One_Way.clear();
+    Pedestrian.clear();
+    Stop_Sign.clear();
+    Construction_Barrel.clear();
+
     #if CALIBRATE_ALIGNMENT
     srv_.reset(new dynamic_reconfigure::Server<CameraLidarFusionConfig>);
-    srv_->setCallback(boost::bind(&CameraLidarFusion::reconfig, this, _1, _2));
+    srv_->setCallback(boost::bind(&SyncedYoloData::reconfig, this, _1, _2));
     #endif
 
     namedWindow("Sync_Output", WINDOW_NORMAL);
@@ -60,6 +69,7 @@ namespace camera_lidar_project
 
     car_boxes.objects.clear();
 
+    //future work: consider looping through YOLO detections first to save on computational intensity
     for (auto& bbox : myArr) 
     {
 
@@ -68,7 +78,7 @@ namespace camera_lidar_project
 
 
       for (auto& detect : object_msg->bounding_boxes)
-        {
+      {
           int bbox_temp = bbox.second.id;
 
 
@@ -76,6 +86,8 @@ namespace camera_lidar_project
           {
          
             One_Way.push_back(bbox.second.id);
+            
+            break;
       
           }
 
@@ -83,20 +95,18 @@ namespace camera_lidar_project
           {
          
             Pedestrian.push_back(bbox.second.id);
+
+            break;
       
           }
 
-          if (detect.Class == "Road Closed" && IoU(cam_box, detect, bbox_temp))
-          {
-         
-            Road_Closed.push_back(bbox.second.id);
-      
-          }
         
           if (detect.Class == "Stop Sign" && IoU(cam_box, detect, bbox_temp))
           {
          
             Stop_Sign.push_back(bbox.second.id);
+
+             break;
       
           }
 
@@ -104,6 +114,8 @@ namespace camera_lidar_project
           {
          
             Construction_Barrel.push_back(bbox.second.id);
+
+             break;
       
           }
         /* This is the code written for the fusion of cars alone
@@ -426,17 +438,21 @@ bool SyncedYoloData::IoU(cv::Rect2d r1, const darknet_ros_msgs::BoundingBox& det
 
   
   if(IoU > 0.5 )
-  {
+    {
 
     return true;
 
     
     One_run.push_back(fresh_objects);
-  }
+    }
+
   else
-  {
-  return false;
-  }
+
+    {
+
+    return false;
+
+    }
 
   
 }
@@ -457,31 +473,73 @@ void SyncedYoloData::reconfig(CameraLidarFusionConfig& config, uint32_t level)
 void SyncedYoloData::recvLidarObjects(const avs_lecture_msgs::TrackedObjectArrayConstPtr& msg)
 {
   
-
-  avs_lecture_msgs::TrackedObjectArray road_closed_boxes;
+  avs_lecture_msgs::TrackedObjectArray one_way_boxes;
+  avs_lecture_msgs::TrackedObjectArray pedestrian_boxes;
+  avs_lecture_msgs::TrackedObjectArray stop_sign_boxes;
+  avs_lecture_msgs::TrackedObjectArray construction_barrel_boxes;
 
 //IoU_output : previous_Box
   for (auto& final_box : msg->objects)
   {
 
-   for (auto& road_closed : Road_Closed)
-   {
+   for (auto& one_way : One_Way)
+    {  
 
-     if(final_box.id == road_closed)
-     {
-        road_closed_boxes.objects.push_back(final_box);
-     }
-     else 
-     {
-       continue;
-     }
+     if(final_box.id == one_way)
+      {
+        one_way_boxes.objects.push_back(final_box);
+        break;
+      }
 
-   }
+    }
+
+    for (auto& pedestrian : Pedestrian)
+    {  
+
+     if(final_box.id == pedestrian)
+      {
+        pedestrian_boxes.objects.push_back(final_box);
+        break;
+      }
+
+    }
+
+    for (auto& stop_sign : Stop_Sign)
+    {  
+
+     if(final_box.id == stop_sign)
+      {
+        stop_sign_boxes.objects.push_back(final_box);
+        break;
+      }
+
+    }
+
+    for (auto& construction_barrel : Construction_Barrel)
+    {  
+
+     if(final_box.id == construction_barrel)
+      {
+        construction_barrel_boxes.objects.push_back(final_box);
+        break;
+      }
+
+    }
+
+
 
   }
-  road_closed_boxes.header = car_boxes.header;
 
-  road_closed_bboxes_.publish(road_closed_boxes);
+  one_way_boxes.header = car_boxes.header;
+  pedestrian_boxes.header = car_boxes.header;
+  stop_sign_boxes.header = car_boxes.header;
+  construction_barrel_boxes.header = car_boxes.header;
+
+
+  one_way_bboxes_.publish(one_way_boxes);
+  pedestrian_bboxes_.publish(pedestrian_boxes);
+  stop_sign_bboxes_.publish(stop_sign_boxes);
+  construction_barrel_bboxes_.publish(construction_barrel_boxes);
   
   
 }

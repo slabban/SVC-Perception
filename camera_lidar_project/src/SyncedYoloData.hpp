@@ -89,41 +89,43 @@ namespace camera_lidar_project
       tf2_ros::Buffer buffer_;
       tf2_ros::StaticTransformBroadcaster broadcaster_;
 
-      ros::Subscriber sub_cam_info_;
-      ros::Publisher road_closed_bboxes_;
       ros::Subscriber sub_lidar_objects_;
+      ros::Subscriber sub_cam_info_;
 
 
-    sensor_msgs::CameraInfo camera_info_;
-    geometry_msgs::TransformStamped camera_transform_; // Coordinate transformation from footprint to camera
-    bool looked_up_camera_transform_;
-
-    std::vector<cv::Rect2d> cam_bboxes_;
-
-    //Array to hold 2D LIDAR Boxes and 3D bounding Boxes
-    std::vector<std::pair<cv::Rect2d, avs_lecture_msgs::TrackedObject> > myArr;
-
-    //Stores the ID of the fused object
-    std::vector<int> previous_Box;
-
-    //IGVC fused objects
-    std::vector<int> One_Way;
-    std::vector<int> Pedestrian;
-    std::vector<int> Road_Closed;
-    std::vector<int> Stop_Sign;
-    std::vector<int> Construction_Barrel;
-
-    
-    // Stores the entire message contents of the fused objects, for future use
-    avs_lecture_msgs::TrackedObjectArray car_boxes;
+      // Segregated fused bounding boxes
+      ros::Publisher one_way_bboxes_;
+      ros::Publisher pedestrian_bboxes_;
+      ros::Publisher stop_sign_bboxes_;
+      ros::Publisher construction_barrel_bboxes_;
 
 
+      sensor_msgs::CameraInfo camera_info_;
+      geometry_msgs::TransformStamped camera_transform_; // Coordinate transformation from footprint to camera
+      bool looked_up_camera_transform_;
 
-    //Stores the latest true IoU results, not used
-    std::vector<int> One_run;
+      std::vector<cv::Rect2d> cam_bboxes_;
 
-    
+      //Array to hold 2D LIDAR Boxes and 3D bounding Boxes
+      std::vector<std::pair<cv::Rect2d, avs_lecture_msgs::TrackedObject> > myArr;
 
+      //Stores the ID of the fused object (Developed for cars)
+      std::vector<int> previous_Box;
+
+      //IGVC fused objects
+      std::vector<int> One_Way;
+      std::vector<int> Pedestrian;
+      std::vector<int> Stop_Sign;
+      std::vector<int> Construction_Barrel;
+
+      
+      // Stores the entire message contents of the fused objects, for future use
+      avs_lecture_msgs::TrackedObjectArray car_boxes;
+
+
+
+      //Stores the latest true IoU results, not used
+      std::vector<int> One_run;
 
     
 
