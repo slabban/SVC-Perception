@@ -3,11 +3,11 @@ subscribers:
 # Topics of Interest
 # Webcams "/front_camera/image_raw"
 # Rosbag Cam "/camera/image_rect_color"
-# GEM Gazebo Cam "/camera_front/image_raw"
+# GEM Gazebo Cam "/camera_front/image_rect_color"
 
 
   camera_reading:
-    topic: /front_camera/image_rect_color
+    topic: /camera_front/image_rect_color
     queue_size: 1
 
 actions:

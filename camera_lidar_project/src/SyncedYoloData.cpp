@@ -175,7 +175,7 @@ namespace camera_lidar_project
     //car_bboxes_.publish(car_boxes);
 
     #if DEBUG
-
+    
     cv::pyrDown(img_raw, img_raw, cv::Size(img_raw.cols/2, img_raw.rows/2));
     imshow("Sync_Output", img_raw);
     waitKey(1);
