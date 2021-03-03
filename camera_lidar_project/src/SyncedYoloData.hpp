@@ -72,7 +72,7 @@ namespace camera_lidar_project
       void IOU(cv::Rect2d r1, const darknet_ros_msgs::BoundingBox& detect);
 
       //void updateTimerCallback(const ros::TimerEvent& event);
-
+      std::string camera_name_;
 
       //Subscriber and Sychronizer for image, darknet bounding boxes, and LIDAR
       boost::shared_ptr<message_filters::Subscriber<sensor_msgs::Image> > sub_img_;

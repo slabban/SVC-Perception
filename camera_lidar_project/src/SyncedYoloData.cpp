@@ -17,7 +17,9 @@ namespace camera_lidar_project
 
   {
 
-    ros::NodeHandle cam_nh("camera");
+    //pn.param("camera name", camera_name_, std::string("camera_front"));
+
+    ros::NodeHandle cam_nh("camera_front");
     sub_cam_info_ = cam_nh.subscribe("camera_info", 1, &SyncedYoloData::recvCameraInfo, this);
     sub_img_.reset(new message_filters::Subscriber<sensor_msgs::Image>(n, "/darknet_ros/detection_image", 5));
     sub_objects_.reset(new message_filters::Subscriber<darknet_ros_msgs::BoundingBoxes>(n, "/darknet_ros/bounding_boxes", 5));
