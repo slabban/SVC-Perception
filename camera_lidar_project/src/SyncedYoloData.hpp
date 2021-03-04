@@ -66,10 +66,8 @@ namespace camera_lidar_project
       void recvLidarObjects(const avs_lecture_msgs::TrackedObjectArrayConstPtr& msg);
 
       // Function that compares 2D Boxes from LIDAR and YOLO
-      bool IoU(cv::Rect2d r1, const darknet_ros_msgs::BoundingBox& detect,  int stale_objects);
+      bool IoU(cv::Rect2d r1, const darknet_ros_msgs::BoundingBox& detect);
 
-      //IGVC IOU Implementation
-      void IOU(cv::Rect2d r1, const darknet_ros_msgs::BoundingBox& detect);
 
       //void updateTimerCallback(const ros::TimerEvent& event);
       std::string camera_name_;
@@ -112,6 +110,7 @@ namespace camera_lidar_project
       //Stores the ID of the fused object (Developed for cars)
       std::vector<int> previous_Box;
 
+
       //IGVC fused objects
       std::vector<int> One_Way;
       std::vector<int> Pedestrian;
@@ -123,9 +122,6 @@ namespace camera_lidar_project
       avs_lecture_msgs::TrackedObjectArray car_boxes;
 
 
-
-      //Stores the latest true IoU results, not used
-      std::vector<int> One_run;
 
     
 

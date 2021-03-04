@@ -19,12 +19,12 @@
   <node pkg="tf2_ros" type="static_transform_publisher" name="footprint_to_LIDAR"   args="1.75 0.2    2.1  0  0.0   0   base_footprint cepton" />
 
 
-  
+ <!-- This launch file comes with Micho's installation for the 2020 ECE6460 course, Homework 3 will perform the same task, but needs configuration --> 
   <include file="$(find avs_lecture_sensor_config)/launch/euclidean_clustering.launch" >
     <arg name="raw_points_topic" value="/cepton/points_raw" />
   </include> 
 
-  <!-- Launch Lidar Segmentation -->
+  <!-- Homework3: Lidar Segmentation -->
  <!-- <include file="$(find homework3)/launch/homework3.launch"> </include> -->
 
   <!-- Launch Homework 4 node -->

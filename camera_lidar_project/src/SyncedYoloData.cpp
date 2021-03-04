@@ -67,8 +67,6 @@ namespace camera_lidar_project
     Mat img_raw = cv_bridge::toCvCopy(img_msg, sensor_msgs::image_encodings::BGR8)->image;
 
 
-    One_run.clear();
-
     car_boxes.objects.clear();
 
     //future work: consider looping through YOLO detections first to save on computational intensity
@@ -84,7 +82,7 @@ namespace camera_lidar_project
           int bbox_temp = bbox.second.id;
 
 
-          if (detect.Class == "One Way" && IoU(cam_box, detect, bbox_temp))
+          if (detect.Class == "One Way" && IoU(cam_box, detect))
           {
          
             One_Way.push_back(bbox.second.id);
@@ -93,7 +91,7 @@ namespace camera_lidar_project
       
           }
 
-          if (detect.Class == "Pedestrian" && IoU(cam_box, detect, bbox_temp))
+          if (detect.Class == "Pedestrian" && IoU(cam_box, detect))
           {
          
             Pedestrian.push_back(bbox.second.id);
@@ -103,7 +101,7 @@ namespace camera_lidar_project
           }
 
         
-          if (detect.Class == "Stop Sign" && IoU(cam_box, detect, bbox_temp))
+          if (detect.Class == "Stop Sign" && IoU(cam_box, detect))
           {
          
             Stop_Sign.push_back(bbox.second.id);
@@ -112,7 +110,7 @@ namespace camera_lidar_project
       
           }
 
-          if (detect.Class == "Construction Barrel" && IoU(cam_box, detect, bbox_temp))
+          if (detect.Class == "Construction Barrel" && IoU(cam_box, detect))
           {
          
             Construction_Barrel.push_back(bbox.second.id);
@@ -120,57 +118,7 @@ namespace camera_lidar_project
              break;
       
           }
-        /* This is the code written for the fusion of cars alone
-        //car_boxes.objects.clear();
-        if (detect.Class != "car")
-        {
 
-        continue;
-        }
-
-        #if DEBUG
-        ROS_INFO("%s \n", detect.Class.c_str());
-
-        double width = (detect.xmax-detect.xmin);
-        double height =(detect.ymax-detect.ymin);
-
-        cv::Rect2d detect_car (detect.xmin, detect.ymin, width, height);
-
-        cv::rectangle(img_raw, detect_car, Scalar(255, 0, 255));
-
-        ROS_INFO("Box ID: %d", bbox_id );
-        #endif
-
-
-        int bbox_temp = bbox.second.id;
-
-        
-        //Compare 2D LIDAR box with YOLO bounding box, return true if IoU is over 50% [The third argument exist to store ID of the Latest successful IoU results, not used]
-        if(IoU(cam_box, detect, bbox_temp))
-        {
-
-          #if DEBUG
-          cv::rectangle(img_raw, cam_box, Scalar(0, 0, 255));
-          #endif
-
-          int bbox_id = bbox.second.id;      
-
-          //ROS_INFO("Box ID: %d", bbox_id );
-
-
-          previous_Box.push_back(bbox_id);
-
-
-          
-          avs_lecture_msgs::TrackedObject car_box = bbox.second;
-
-          car_box.header = car_boxes.header;
-
-        
-          car_boxes.objects.push_back(car_box);
-      
-         }
-         */
       }
    }
 
@@ -292,88 +240,9 @@ void SyncedYoloData::recvCameraInfo(const sensor_msgs::CameraInfoConstPtr& msg)
   camera_info_ = *msg;
 }
 
-void SyncedYoloData::IOU(cv::Rect2d r1, const darknet_ros_msgs::BoundingBox& detect)
-{  
-
- //cv::Rect2d r2
-  //define maximum point on the rectangles, bottom right point of the rectangle
- 
-  double r1_xmax = r1.br().x;
-  double r1_ymax = r1.br().y;
-
-  //double r2_xmax = r2.br().x;
-  //double r2_ymax = r2.br().y;
-
-  double r2_xmin = detect.xmin;
-  double r2_ymin = detect.ymin;
-
-  double r2_xmax = detect.xmax;
-  double r2_ymax = detect.ymax;
-
-  double width = (detect.xmax-detect.xmin);
-  double height =(detect.ymax-detect.ymin);
 
 
-  // If one rectangle is on left side of other 
-  if (r1.x >= r2_xmax || detect.xmin >= r1_xmax)
-  {
-   return;
-  }
-    
-         
-   //If one rectangle is above other (Recall down is positive in OpenCV)
-  if (r1.y >= r2_ymax || detect.ymin >= r1_ymax) 
-  {
-    return;
-  }
-
-
-  //Area of rectangles
-  double r1_area = r1.area();
-  //double r2_area = r2.area();
-  double r2_area = width * height;
-
-
-  //Locate top-left of intersected rectangle
-  //double ri_x = max(r1.x,r2.x);
-  //double ri_y = max(r1.y, r2.y);
-
-  double ri_x = max(r1.x, r2_xmin);
-  double ri_y = max(r1.y, r2_ymin);
-
-  //Locate top-right of intersected rectangle
-  double ri_xmax = min(r1_xmax,r2_xmax);
-  double ri_ymax = min(r1_ymax,r2_ymax);
-
-  //Calculate Intersected Width
-  double ri_width = ri_xmax - ri_x;
-
-  //Calculate Intersected Height
-  double ri_height = ri_ymax - ri_y;
-
-  //Area of intersection
-  double ri_area = ri_height*ri_width;
-
-  //Determine Intersection over Union
-  double IoU = ri_area/((r1_area + r2_area)-ri_area);
-
-  
-  if(IoU > 0.5 )
-  {
-
-    //populate fused class vector
-
-    
-  }
-  else
-  {
-  return;
-  }
-
-  
-}
-
-bool SyncedYoloData::IoU(cv::Rect2d r1, const darknet_ros_msgs::BoundingBox& detect, int fresh_objects)
+bool SyncedYoloData::IoU(cv::Rect2d r1, const darknet_ros_msgs::BoundingBox& detect)
 {  
 
  //cv::Rect2d r2
@@ -444,8 +313,6 @@ bool SyncedYoloData::IoU(cv::Rect2d r1, const darknet_ros_msgs::BoundingBox& det
 
     return true;
 
-    
-    One_run.push_back(fresh_objects);
     }
 
   else
